@@ -1,23 +1,28 @@
- const express = require("express");
+const express = require("express");
 const cors = require("cors");
 const mysql = require("mysql");
 const bodyParser = require("body-parser");
+require("dotenv").config(); // ✅ load .env variables
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
+// ✅ MySQL connection using env variables
 const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "",        // ← agar tumhara password hai to yahan likho
-  database: "auth_db", // ← pehle MySQL me yeh DB banana hoga
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
 });
 
 // ✅ Connect DB
 db.connect((err) => {
-  if (err) throw err;
-  console.log("MySQL Connected...");
+  if (err) {
+    console.error("Database connection failed:", err);
+    return;
+  }
+  console.log("✅ MySQL Connected...");
 });
 
 // ✅ Signup route
@@ -44,8 +49,8 @@ app.post("/login", (req, res) => {
   });
 });
 
-// ✅ Start server
-app.listen(5000, () => {
-  console.log("Server running on http://localhost:5000");
+// ✅ Use dynamic port
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`✅ Server running on http://localhost:${PORT}`);
 });
-
