@@ -21,7 +21,8 @@ export default function Signup() {
     e.preventDefault();
 
     try {
-      const response = await fetch("/signup", {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/signup`, {
+
         method: "POST",
         headers: {
           "Content-Type": "application/json",
