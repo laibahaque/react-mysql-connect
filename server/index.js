@@ -25,7 +25,7 @@ db.run(
   )`
 );
 
-// ✅ Root route (NEWLY ADDED)
+// ✅ Root route (only one)
 app.get("/", (req, res) => {
   res.send("Server is up and running!");
 });
