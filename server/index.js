@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const sqlite3 = require("sqlite3").verbose(); // ✅ Use SQLite3
+const sqlite3 = require("sqlite3").verbose();
 const bodyParser = require("body-parser");
 const path = require("path");
 
@@ -24,6 +24,11 @@ db.run(
     password TEXT
   )`
 );
+
+// ✅ Root route (NEWLY ADDED)
+app.get("/", (req, res) => {
+  res.send("Server is up and running!");
+});
 
 // ✅ Signup route
 app.post("/signup", (req, res) => {
