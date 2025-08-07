@@ -1,31 +1,36 @@
- const express = require("express");
+const express = require("express");
 const cors = require("cors");
-const mysql = require("mysql");
+const sqlite3 = require("sqlite3").verbose(); // ✅ Use SQLite3
 const bodyParser = require("body-parser");
+const path = require("path");
 
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "",        // ← agar tumhara password hai to yahan likho
-  database: "auth_db", // ← pehle MySQL me yeh DB banana hoga
+// ✅ Create or open SQLite database file
+const dbPath = path.resolve(__dirname, "auth_db.sqlite");
+const db = new sqlite3.Database(dbPath, (err) => {
+  if (err) return console.error(err.message);
+  console.log("SQLite3 Connected...");
 });
 
-// ✅ Connect DB
-db.connect((err) => {
-  if (err) throw err;
-  console.log("MySQL Connected...");
-});
+// ✅ Create table if not exists
+db.run(
+  `CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT,
+    email TEXT UNIQUE,
+    password TEXT
+  )`
+);
 
 // ✅ Signup route
 app.post("/signup", (req, res) => {
   const { username, email, password } = req.body;
   const sql = "INSERT INTO users (username, email, password) VALUES (?, ?, ?)";
-  db.query(sql, [username, email, password], (err, result) => {
-    if (err) return res.json({ success: false, error: err });
+  db.run(sql, [username, email, password], function (err) {
+    if (err) return res.json({ success: false, error: err.message });
     res.json({ success: true, message: "User registered successfully" });
   });
 });
@@ -34,9 +39,9 @@ app.post("/signup", (req, res) => {
 app.post("/login", (req, res) => {
   const { email, password } = req.body;
   const sql = "SELECT * FROM users WHERE email = ? AND password = ?";
-  db.query(sql, [email, password], (err, results) => {
-    if (err) return res.json({ success: false, error: err });
-    if (results.length > 0) {
+  db.get(sql, [email, password], (err, row) => {
+    if (err) return res.json({ success: false, error: err.message });
+    if (row) {
       res.json({ success: true, message: "Login successful" });
     } else {
       res.json({ success: false, message: "Invalid credentials" });
@@ -48,4 +53,3 @@ app.post("/login", (req, res) => {
 app.listen(5000, () => {
   console.log("Server running on http://localhost:5000");
 });
-
