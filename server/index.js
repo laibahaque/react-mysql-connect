@@ -25,9 +25,9 @@ db.run(
   )`
 );
 
-// ✅ Root route to check if backend is working
+// ✅ Root route (only one)
 app.get("/", (req, res) => {
-  res.send("✅ Backend is LIVE & working!");
+  res.send("Server is up and running!");
 });
 
 // ✅ Signup route
@@ -54,9 +54,7 @@ app.post("/login", (req, res) => {
   });
 });
 
-// ✅ Final: PORT must be from Railway OR fallback to 5000
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on http://0.0.0.0:${PORT}`);
+// ✅ Start server
+app.listen(5000, () => {
+  console.log("Server running on http://localhost:5000");
 });
-
